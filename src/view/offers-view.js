@@ -7,23 +7,26 @@ const createOffersTemplate = (offers) => (
 );
 
 export default class OffersView {
+  #element = null;
+  #offers = null;
+
   constructor(offers){
-    this.offers = offers;
+    this.#offers = offers;
   }
 
-  getTemplate () {
-    return createOffersTemplate(this.offers);
+  get template () {
+    return createOffersTemplate(this.#offers);
   }
 
-  getElement() {
-    if (!this.element){
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element){
+      this.#element = createElement(this.getTemplate());
     }
 
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }
