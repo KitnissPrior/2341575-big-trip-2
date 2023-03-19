@@ -20,7 +20,7 @@ const getOffers = (selectedItems, allItems) => {
     }
   });
 
-  return new OffersView(offers).getTemplate();
+  return new OffersView(offers).template;
 };
 
 const createPointTemplate = (point, availableDestinations) => {
@@ -87,7 +87,7 @@ export default class PointView {
 
   get element() {
     if (!this.#element){
-      this.#element = createElement(this.getTemplate());
+      this.#element = createElement(this.template);
     }
 
     return this.#element;

@@ -1,6 +1,5 @@
 import EventsView from '../view/trip-events-view.js';
 import PointView from '../view/point-view.js';
-import NewFormView from '../view/new-form-view.js';
 import EditingFormView from '../view/editing-form-view.js';
 import SortingView from '../view/sorting-view.js';
 import { render } from '../render.js';
@@ -13,7 +12,7 @@ export default class TripEventsPresenter {
     this.#eventsList = new EventsView();
   }
 
-  init (tripContainer, pointsModel, editingFormModel, destinationsModel) {
+  init (tripContainer, pointsModel, destinationsModel) {
     this.tripContainer = tripContainer;
     this.pointsModel = pointsModel;
     this.points = [...this.pointsModel.points];
@@ -32,33 +31,43 @@ export default class TripEventsPresenter {
     const editingForm = new EditingFormView(point, this.destinations);
 
     const replacePointToEditForm = () => {
-      this.#eventsList.element.replaceChild(pointComponent.element, editingForm.element);
+      this.#eventsList.element.replaceChild(editingForm.element, pointComponent.element);
     }
 
     const replaceEditFormToPoint = () => {
-      this.#eventsList.element.replaceChild(editingForm.element, pointComponent.element);
+      this.#eventsList.element.replaceChild(pointComponent.element, editingForm.element);
+    }
+
+    const closeEditForm = () => {
+      replaceEditFormToPoint();
+      document.removeEventListener('keydown', onEscKeyDown);
     }
 
     const onEscKeyDown = (evt) => {
       if (isEscape(evt)) {
         evt.preventDefault();
-        replaceEditFormToPoint();
-        document.removeEventListener('keydown', onEscKeyDown);
+        closeEditForm();
       }
     }
 
-    pointComponent.element.querySelector('.event__rollup-btn').addEventListener('click', () => {
+    const onCloseEditFormClick = () => closeEditForm();
+
+    const onOpenEditFormClick = () => {
       replacePointToEditForm();
       document.addEventListener('keydown', onEscKeyDown);
-    });
+    }
 
-    pointComponent.element.querySelector('.event__save-btn').addEventListener('submit', (evt) => {
+    const onEditFormSubmit = (evt) => {
       evt.preventDefault();
-      replaceEditFormToPoint();
-      document.removeEventListener('keydown', onEscKeyDown);
-    })
+      closeEditForm();
+    }
+
+    pointComponent.element.querySelector('.event__rollup-btn').addEventListener('click', onOpenEditFormClick);
+
+    editingForm.element.addEventListener('submit', onEditFormSubmit);
+
+    editingForm.element.querySelector('.event__rollup-btn').addEventListener('click', onCloseEditFormClick);
 
     render(pointComponent, this.#eventsList.element);
-
   }
 }

@@ -33,12 +33,12 @@ export default class SortingView {
   #element = null;
 
   get template () {
-    return createSortingTemplate;
+    return createSortingTemplate();
   }
 
   get element() {
     if (!this.#element){
-      this.#element = createElement(this.getTemplate());
+      this.#element = createElement(this.template);
     }
 
     return this.#element;

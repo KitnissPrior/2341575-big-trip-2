@@ -9,12 +9,12 @@ export default class TripEventsView {
   #element = null;
 
   get template () {
-    return createTripEventsTemplate;
+    return createTripEventsTemplate();
   }
 
   get element() {
     if (!this.#element){
-      this.#element = createElement(this.getTemplate());
+      this.#element = createElement(this.template);
     }
 
     return this.#element;

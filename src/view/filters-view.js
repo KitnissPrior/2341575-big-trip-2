@@ -25,12 +25,12 @@ export default class FiltersView {
   #element = null;
 
   get template () {
-    return createFiltersTemplate;
+    return createFiltersTemplate();
   }
 
   get element() {
     if (!this.#element){
-      this.#element = createElement(this.getTemplate());
+      this.#element = createElement(this.template);
     }
 
     return this.#element;
