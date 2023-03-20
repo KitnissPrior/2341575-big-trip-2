@@ -20,7 +20,7 @@ const getOffers = (selectedItems, allItems) => {
     }
   });
 
-  return new OffersView(offers).getTemplate();
+  return new OffersView(offers).template;
 };
 
 const createPointTemplate = (point, availableDestinations) => {
@@ -72,24 +72,28 @@ const createPointTemplate = (point, availableDestinations) => {
 };
 
 export default class PointView {
+  #element = null;
+  #point = null;
+  #allDestinations = null;
+
   constructor(point, allDestinations){
-    this.point = point;
-    this.allDestinations = allDestinations;
+    this.#point = point;
+    this.#allDestinations = allDestinations;
   }
 
-  getTemplate () {
-    return createPointTemplate(this.point, this.allDestinations);
+  get template () {
+    return createPointTemplate(this.#point, this.#allDestinations);
   }
 
-  getElement() {
-    if (!this.element){
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element){
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }

@@ -2,9 +2,11 @@ import { generateDestination } from '../fish/destination';
 import { DESTINATIONS } from '../fish/constants.js';
 
 export default class DestinationsModel{
+  #destinations = null;
+
   constructor (){
-    this.destinations = Array.from({length: DESTINATIONS.length},(value, index) => generateDestination(index));
+    this.#destinations = Array.from({length: DESTINATIONS.length},(value, index) => generateDestination(index));
   }
 
-  getDestinations () {return this.destinations;}
+  get destinations () {return this.#destinations;}
 }

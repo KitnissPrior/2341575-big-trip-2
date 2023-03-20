@@ -43,6 +43,8 @@ const getEventDuration = (dateFrom, dateTo) => {
 
 const humanizeFormDate = (date) => dayjs(date).format('DD/MM/YY HH:mm');
 
+const isEscape = (evt) => evt.key === 'Escape' || evt.key === 'Esc';
+
 export{getRandomNumber, getRandomElement,
   humanizePointDay, humanizePointTime, humanizeFormDate,
-  getEventDuration};
+  getEventDuration, isEscape};
