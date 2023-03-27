@@ -3,19 +3,6 @@ import duration from 'dayjs/plugin/duration';
 
 dayjs.extend(duration);
 
-const getRandomNumber = (start, end) => {
-  start = Math.min(start,end);
-  end = Math.max(start, end);
-
-  return Math.round(Math.random()* (end - start) + start);
-};
-
-const getRandomElement = (elements) => {
-  const randomIndex = getRandomNumber(0, elements.length - 1);
-
-  return elements[randomIndex];
-};
-
 const humanizePointDay = (date) => dayjs(date).format('D MMMM');
 
 const humanizePointTime = (date) => dayjs(date).format('HH:mm');
@@ -43,8 +30,4 @@ const getEventDuration = (dateFrom, dateTo) => {
 
 const humanizeFormDate = (date) => dayjs(date).format('DD/MM/YY HH:mm');
 
-const isEscape = (evt) => evt.key === 'Escape' || evt.key === 'Esc';
-
-export{getRandomNumber, getRandomElement,
-  humanizePointDay, humanizePointTime, humanizeFormDate,
-  getEventDuration, isEscape};
+export{ humanizePointDay, humanizePointTime, humanizeFormDate, getEventDuration };

@@ -1,4 +1,4 @@
-import { getRandomElement} from '../utils.js';
+import { getRandomElement} from '../utils/common.js';
 import { DESCRIPTIONS, DESTINATIONS } from './constants.js';
 import { generatePictures } from './picture.js';
 

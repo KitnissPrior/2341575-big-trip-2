@@ -1,6 +1,6 @@
-import { createElement } from '../render.js';
-import { humanizePointDay, humanizePointTime, getEventDuration } from '../utils.js';
+import { humanizePointDay, humanizePointTime, getEventDuration } from '../utils/point.js';
 import { getOffersByType } from '../fish/offers.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import OffersView from './offers-view.js';
 
 const getOffers = (selectedItems, allItems) => {
@@ -71,12 +71,12 @@ const createPointTemplate = (point, availableDestinations) => {
 </li>`);
 };
 
-export default class PointView {
-  #element = null;
+export default class PointView extends AbstractView {
   #point = null;
   #allDestinations = null;
 
   constructor(point, allDestinations){
+    super();
     this.#point = point;
     this.#allDestinations = allDestinations;
   }
@@ -85,15 +85,13 @@ export default class PointView {
     return createPointTemplate(this.#point, this.#allDestinations);
   }
 
-  get element() {
-    if (!this.#element){
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
+  setEditClickHandler = (callback) => {
+    this._callback.editClick = callback;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#editClickHandler);
   }
 
-  removeElement() {
-    this.#element = null;
-  }
+  #editClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.editClick();
+  };
 }

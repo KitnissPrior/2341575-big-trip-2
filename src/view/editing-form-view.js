@@ -1,6 +1,6 @@
-import { createElement } from '../render.js';
-import { humanizeFormDate } from '../utils.js';
+import { humanizeFormDate } from '../utils/point.js';
 import { getOffersByType } from '../fish/offers.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 const fillOffersList = (checkedItems, allOffers) => {
   let offers = '';
@@ -201,12 +201,12 @@ const createEditingFormTemplate = (form, allDestinations) => {
   );
 };
 
-export default class EditingFormView {
-  #element = null;
+export default class EditingFormView extends AbstractView {
   #form = null;
   #destinations = null;
 
   constructor(form, allDestinatioins){
+    super();
     this.#form = form;
     this.#destinations = allDestinatioins;
   }
@@ -215,15 +215,23 @@ export default class EditingFormView {
     return createEditingFormTemplate(this.#form, this.#destinations);
   }
 
-  get element() {
-    if (!this.#element){
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
+  setFormSubmitHandler = (callback) => {
+    this._callback.formSubmit = callback;
+    this.element.addEventListener('submit', this.#formSubmitHandler);
   }
 
-  removeElement() {
-    this.#element = null;
+  #formSubmitHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.formSubmit();
+  };
+
+  setFormCloseHandler = (callback) => {
+    this._callback.formClose = callback;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#formCloseHandler);
+  }
+
+  #formCloseHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.formClose();
   }
 }

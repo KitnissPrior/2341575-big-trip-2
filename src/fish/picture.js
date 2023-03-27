@@ -1,4 +1,4 @@
-import { getRandomElement, getRandomNumber } from '../utils.js';
+import { getRandomElement, getRandomNumber } from '../utils/common.js';
 import { PICTURE_DISCRIPTIONS, PicturesInfo } from './constants.js';
 
 const generatePicture = () => ({
