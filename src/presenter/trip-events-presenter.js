@@ -43,24 +43,26 @@ export default class TripEventsPresenter {
 
     const replacePointToEditForm = () => {
       replace(editingForm, pointComponent);
-    }
+    };
 
     const replaceEditFormToPoint = () => {
       replace(pointComponent, editingForm);
-    }
-
-    const closeEditForm = () => {
-      replaceEditFormToPoint();
-      document.removeEventListener('keydown', onEscKeyDown);
-    }
+    };
 
     const onEscKeyDown = (evt) => {
       if (isEscape(evt)) {
         evt.preventDefault();
-        closeEditForm();
+
+        replaceEditFormToPoint();
+        document.removeEventListener('keydown', onEscKeyDown);
       }
-    }
-    
+    };
+
+    const closeEditForm = () => {
+      replaceEditFormToPoint();
+      document.removeEventListener('keydown', onEscKeyDown);
+    };
+
     pointComponent.setEditClickHandler(() => {
       replacePointToEditForm();
       document.addEventListener('keydown', onEscKeyDown);
