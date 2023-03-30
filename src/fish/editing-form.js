@@ -1,4 +1,4 @@
-import { getRandomNumber, getRandomElement } from '../utils.js';
+import { getRandomNumber, getRandomElement } from '../utils/common.js';
 import { generateDate } from './dates.js';
 import { generateOffersByType} from './offers.js';
 import { generateDestination } from './destination.js';

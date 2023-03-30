@@ -3,8 +3,8 @@ import NoEventsView from '../view/no-events-view.js';
 import PointView from '../view/point-view.js';
 import EditingFormView from '../view/editing-form-view.js';
 import SortingView from '../view/sorting-view.js';
-import { render } from '../render.js';
-import { isEscape } from '../utils.js';
+import {render, replace } from '../framework/render.js';
+import { isEscape } from '../utils/common.js';
 
 export default class TripEventsPresenter {
   #eventsList = null;
@@ -42,42 +42,34 @@ export default class TripEventsPresenter {
     const editingForm = new EditingFormView(point, this.#destinations);
 
     const replacePointToEditForm = () => {
-      this.#eventsList.element.replaceChild(editingForm.element, pointComponent.element);
-    }
+      replace(editingForm, pointComponent);
+    };
 
     const replaceEditFormToPoint = () => {
-      this.#eventsList.element.replaceChild(pointComponent.element, editingForm.element);
-    }
-
-    const closeEditForm = () => {
-      replaceEditFormToPoint();
-      document.removeEventListener('keydown', onEscKeyDown);
-    }
+      replace(pointComponent, editingForm);
+    };
 
     const onEscKeyDown = (evt) => {
       if (isEscape(evt)) {
         evt.preventDefault();
-        closeEditForm();
+
+        replaceEditFormToPoint();
+        document.removeEventListener('keydown', onEscKeyDown);
       }
-    }
+    };
 
-    const onCloseEditFormClick = () => closeEditForm();
+    const closeEditForm = () => {
+      replaceEditFormToPoint();
+      document.removeEventListener('keydown', onEscKeyDown);
+    };
 
-    const onOpenEditFormClick = () => {
+    pointComponent.setEditClickHandler(() => {
       replacePointToEditForm();
       document.addEventListener('keydown', onEscKeyDown);
-    }
+    });
 
-    const onEditFormSubmit = (evt) => {
-      evt.preventDefault();
-      closeEditForm();
-    }
-
-    pointComponent.element.querySelector('.event__rollup-btn').addEventListener('click', onOpenEditFormClick);
-
-    editingForm.element.addEventListener('submit', onEditFormSubmit);
-
-    editingForm.element.querySelector('.event__rollup-btn').addEventListener('click', onCloseEditFormClick);
+    editingForm.setFormSubmitHandler(closeEditForm);
+    editingForm.setFormCloseHandler(closeEditForm);
 
     render(pointComponent, this.#eventsList.element);
   }

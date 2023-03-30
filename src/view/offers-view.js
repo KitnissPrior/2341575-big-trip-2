@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 const createOffersTemplate = (offers) => (
   `<ul class="event__selected-offers">
@@ -6,27 +6,15 @@ const createOffersTemplate = (offers) => (
   </ul>`
 );
 
-export default class OffersView {
-  #element = null;
+export default class OffersView extends AbstractView {
   #offers = null;
 
   constructor(offers){
+    super();
     this.#offers = offers;
   }
 
   get template () {
     return createOffersTemplate(this.#offers);
-  }
-
-  get element() {
-    if (!this.#element){
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }
