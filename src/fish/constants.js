@@ -1,6 +1,6 @@
 const TYPES = ['taxi', 'bus', 'train', 'ship','drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
 
-const POINTS_COUNT = 20;
+const POINTS_COUNT = 5;
 
 const DESTINATIONS = [
   'Praha',
@@ -53,5 +53,11 @@ const OffersCount = {
   MAX: 6
 };
 
+const FilterType = {
+  EVERYTHING: 'everything',
+  FUTURE: 'future',
+  PAST: 'past',
+};
+
 export {TYPES, POINTS_COUNT, DESTINATIONS, OFFERS, DESCRIPTIONS, PICTURE_DISCRIPTIONS,
-  PicturesInfo, Prices, OffersCount};
+  PicturesInfo, Prices, OffersCount, FilterType};

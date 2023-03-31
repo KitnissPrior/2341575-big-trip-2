@@ -63,10 +63,12 @@ export default class TripEventsPresenter {
       document.removeEventListener('keydown', onEscKeyDown);
     };
 
-    pointComponent.setEditClickHandler(() => {
+    const handleEditClick = () => {
       replacePointToEditForm();
       document.addEventListener('keydown', onEscKeyDown);
-    });
+    };
+
+    pointComponent.setEditClickHandler(handleEditClick);
 
     editingForm.setFormSubmitHandler(closeEditForm);
     editingForm.setFormCloseHandler(closeEditForm);
