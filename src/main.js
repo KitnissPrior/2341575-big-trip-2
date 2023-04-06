@@ -1,4 +1,5 @@
 import {render} from './framework/render.js';
+import {generateFilter} from './fish/filter.js';
 import FiltersView from './view/filters-view.js';
 import TripEventsPresenter from './presenter/trip-events-presenter.js';
 import PointsModel from './model/points-model.js';
@@ -11,6 +12,8 @@ const tripPresenter = new TripEventsPresenter();
 const pointsModel = new PointsModel();
 const destinationsModel = new DestinationsModel();
 
-render(new FiltersView(), siteHeaderElement.querySelector('.trip-controls__filters'));
+const filters = generateFilter(pointsModel.points);
+
+render(new FiltersView(filters), siteHeaderElement.querySelector('.trip-controls__filters'));
 
 tripPresenter.init(siteMainElement.querySelector('.trip-events'), pointsModel, destinationsModel);

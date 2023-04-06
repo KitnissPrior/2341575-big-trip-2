@@ -30,4 +30,9 @@ const getEventDuration = (dateFrom, dateTo) => {
 
 const humanizeFormDate = (date) => dayjs(date).format('DD/MM/YY HH:mm');
 
-export{ humanizePointDay, humanizePointTime, humanizeFormDate, getEventDuration };
+const isPastPoint = (point) => dayjs(point.dateFrom).isBefore(dayjs());
+
+const isFuturePoint = (point) => dayjs(point.dateFrom).isAfter(dayjs());
+
+export{ humanizePointDay, humanizePointTime, humanizeFormDate, getEventDuration,
+  isPastPoint, isFuturePoint };
