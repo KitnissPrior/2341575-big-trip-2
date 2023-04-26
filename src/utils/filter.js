@@ -1,4 +1,4 @@
-import { FilterType } from '../fish/constants';
+import { FilterType } from '../const.js';
 import { isFuturePoint, isPastPoint } from './point';
 
 const filterPoints = {

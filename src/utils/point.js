@@ -28,6 +28,46 @@ const getEventDuration = (dateFrom, dateTo) => {
   return eventDuration;
 };
 
+const getWeightForNullDate = (dateA, dateB) => {
+  if (dateA === null && dateB === null) {
+    return 0;
+  }
+
+  if (dateA === null) {
+    return 1;
+  }
+
+  if (dateB === null) {
+    return -1;
+  }
+
+  return null;
+};
+
+const getWrightForTwoNullDates = (pointA, pointB) => {
+  const weightA = getWeightForNullDate(pointA.dateFrom, pointA.dateTo);
+  const weightB = getWeightForNullDate(pointB.dateFrom, pointB.dateTo);
+
+  return weightA && weightB;
+};
+
+const sortPointsByDay = (pointA, pointB) => {
+  const weight = getWeightForNullDate(pointA.dateFrom, pointB.dateFrom);
+
+  return weight ?? dayjs(pointA.dateFrom).diff(dayjs(pointB.dateFrom));
+};
+
+const sortPointsByTime = (pointA, pointB) => {
+  const weight = getWrightForTwoNullDates(pointA, pointB);
+
+  const timeA = dayjs(pointA.dateTo).diff(dayjs(pointA.dateFrom));
+  const timeB = dayjs(pointB.dateTo).diff(dayjs(pointB.dateFrom));
+
+  return weight?? timeB - timeA;
+};
+
+const sortPointsByPrice = (pointA, pointB) => pointB.basePrice - pointA.basePrice;
+
 const humanizeFormDate = (date) => dayjs(date).format('DD/MM/YY HH:mm');
 
 const isPastPoint = (point) => dayjs(point.dateFrom).isBefore(dayjs());
@@ -35,4 +75,4 @@ const isPastPoint = (point) => dayjs(point.dateFrom).isBefore(dayjs());
 const isFuturePoint = (point) => dayjs(point.dateFrom).isAfter(dayjs());
 
 export{ humanizePointDay, humanizePointTime, humanizeFormDate, getEventDuration,
-  isPastPoint, isFuturePoint };
+  isPastPoint, isFuturePoint, getWeightForNullDate, sortPointsByDay, sortPointsByTime, sortPointsByPrice };
