@@ -1,21 +1,21 @@
 import { humanizePointDay, humanizePointTime, getEventDuration } from '../utils/point.js';
-import { getOffersByType } from '../fish/offers.js';
+import { getOffersByType } from '../utils/common.js';
 import AbstractView from '../framework/view/abstract-view.js';
 import OffersView from './offers-view.js';
 
-const getOffers = (selectedItems, allItems) => {
-  if (allItems.length === 0){
+const getOffersBlock = (checkedOffers, allOffers) => {
+  if (allOffers.length === 0 || checkedOffers.length === 0){
     return '';
   }
 
   let offers = '';
 
-  allItems.forEach((item) => {
-    if (selectedItems.find((offer) => offer.id === item.id)){
+  allOffers.offers.forEach((offer) => {
+    if (checkedOffers.find((checkedOffer) => checkedOffer.id === offer.id)){
       offers += `<li class="event__offer">
-      <span class="event__offer-title">${item.title}</span>
+      <span class="event__offer-title">${offer.title}</span>
       &plus;&euro;&nbsp;
-      <span class="event__offer-price">${item.price}</span>
+      <span class="event__offer-price">${offer.price}</span>
     </li>`;
     }
   });
@@ -23,12 +23,12 @@ const getOffers = (selectedItems, allItems) => {
   return new OffersView(offers).template;
 };
 
-const createPointTemplate = (point, availableDestinations) => {
+const createPointTemplate = (point, availableDestinations, allOffers) => {
   const {basePrice, dateFrom, dateTo, destination, isFavourite, offers, type} = point;
 
   const hasStar = isFavourite? 'event__favorite-btn--active' : '';
 
-  const allOffers = getOffers(offers.offers, getOffersByType(type));
+  const offersBlock = getOffersBlock(offers.offers, getOffersByType(allOffers, type));
 
   const humanizedDate = humanizePointDay(dateFrom);
   const timeFrom = humanizePointTime(dateFrom);
@@ -57,7 +57,7 @@ const createPointTemplate = (point, availableDestinations) => {
       &euro;&nbsp;<span class="event__price-value">${basePrice}</span>
     </p>
     <h4 class="visually-hidden">Offers:</h4>
-    ${allOffers}
+    ${offersBlock}
     <button class="event__favorite-btn ${hasStar}" type="button">
       <span class="visually-hidden">Add to favorite</span>
       <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
@@ -74,15 +74,17 @@ const createPointTemplate = (point, availableDestinations) => {
 export default class PointView extends AbstractView {
   #point = null;
   #allDestinations = null;
+  #allOffers = null;
 
-  constructor(point, allDestinations){
+  constructor(point, allDestinations, allOffers){
     super();
     this.#point = point;
     this.#allDestinations = allDestinations;
+    this.#allOffers = allOffers;
   }
 
   get template () {
-    return createPointTemplate(this.#point, this.#allDestinations);
+    return createPointTemplate(this.#point, this.#allDestinations, this.#allOffers);
   }
 
   setEditClickHandler = (callback) => {

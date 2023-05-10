@@ -2,7 +2,7 @@ import { getRandomElement, getRandomNumber } from '../utils/common.js';
 import { PICTURE_DISCRIPTIONS, PicturesInfo } from './constants.js';
 
 const generatePicture = () => ({
-  'src': `http://picsum.photos/248/152?r=${getRandomNumber(0, PicturesInfo.SRC)}`,
+  'src': `http://picsum.photos/300/200?r=${getRandomNumber(0, PicturesInfo.SRC)}`,
   'description': getRandomElement(PICTURE_DISCRIPTIONS),
 });
 

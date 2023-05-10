@@ -11,6 +11,8 @@ const getRandomElement = (elements) => {
   return elements[randomIndex];
 };
 
+const getOffersByType = (offers, type) => offers.find((offer) => offer.type === type);
+
 const isEscape = (evt) => evt.key === 'Escape' || evt.key === 'Esc';
 
 const updateItem = (items, update) => {
@@ -27,4 +29,4 @@ const updateItem = (items, update) => {
   ];
 };
 
-export {getRandomNumber, getRandomElement, isEscape, updateItem};
+export {getRandomNumber, getRandomElement, isEscape, updateItem, getOffersByType};

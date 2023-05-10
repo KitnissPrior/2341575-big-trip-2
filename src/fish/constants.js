@@ -1,6 +1,6 @@
 const TYPES = ['taxi', 'bus', 'train', 'ship','drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
 
-const POINTS_COUNT = 5;
+const POINTS_COUNT = 10;
 
 const DESTINATIONS = [
   'Praha',
@@ -12,14 +12,6 @@ const DESTINATIONS = [
   'Detroit',
   'Madrid',
   'London',
-];
-
-const OFFERS = [
-  'Upgrade to a business class',
-  'Add breakfast',
-  'Rent a car',
-  'Book tickets',
-  'Switch to comfort',
 ];
 
 const DESCRIPTIONS = [
@@ -53,5 +45,5 @@ const OffersCount = {
   MAX: 6
 };
 
-export {TYPES, POINTS_COUNT, DESTINATIONS, OFFERS, DESCRIPTIONS, PICTURE_DISCRIPTIONS,
+export {TYPES, POINTS_COUNT, DESTINATIONS, DESCRIPTIONS, PICTURE_DISCRIPTIONS,
   PicturesInfo, Prices, OffersCount };
