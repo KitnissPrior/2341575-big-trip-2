@@ -6,9 +6,12 @@ import {nanoid} from 'nanoid';
 import { generateDestination } from '../fish/destination';
 
 export const generatePoint = () => {
-  const type = getRandomElement(TYPES);
+  const typeId = getRandomNumber(0, TYPES.length-1)
+  const type = TYPES[typeId];
   const dateFrom = generateDate();
   const destinations = Array.from({length: DESTINATIONS.length}, (value, index) => generateDestination(index));
+  const isEmptyOffers = getRandomNumber(0, TYPES.length) > TYPES.length - 3;
+
 
   return ({
     'basePrice': getRandomNumber(Prices.MIN, Prices.MAX),
@@ -17,7 +20,7 @@ export const generatePoint = () => {
     'destination': getRandomElement(destinations).id,
     'id': nanoid(),
     'isFavourite': Boolean(getRandomNumber(0,1)),
-    'offers': generateOffersByType(type),
+    'offers': generateOffersByType(typeId, isEmptyOffers),
     type,
   });
 };

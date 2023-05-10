@@ -165,7 +165,90 @@ const createNewFormTemplate = () => (
   </li>`);
 
 export default class NewFormView extends AbstractView {
+  _state = null;
+  #destinations = null;
+  #allOffers = null;
+
+  constructor( allDestinatioins, allOffers){
+    super();
+    this.#destinations = allDestinatioins;
+    this.#allOffers = allOffers;
+
+    this.#setInnerHandlers();
+  }
+
   get template () {
     return createNewFormTemplate();
   }
+
+  reset = (point) => {
+    this.updateElement(
+      EditingFormView.parseFormToState(point),
+    );
+  };
+
+  setFormSubmitHandler = (callback) => {
+    this._callback.formSubmit = callback;
+    this.element.addEventListener('submit', this.#formSubmitHandler);
+  };
+
+  setFormCloseHandler = (callback) => {
+    this._callback.formClose = callback;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#formCloseHandler);
+  };
+
+  _restoreHandlers = () => {
+    this.#setInnerHandlers();
+    this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setFormCloseHandler(this._callback.formClose);
+  };
+
+  #setInnerHandlers = () => {
+    this.element.querySelector('.event__type-list').addEventListener('click', this.#pointTypeClickHandler);
+
+    if(this._state && this._state.offers.offers.length && this.#allOffers.length){
+      this.element.querySelector('.event__available-offers').addEventListener('click', this.#offersClickHandler);
+    }
+
+    this.element.querySelector('.event__input--destination').addEventListener('input', this.#destinationInputHandler);
+  };
+
+  #formSubmitHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.formSubmit(EditingFormView.parseStateToForm(this._state));
+  };
+
+  #formCloseHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.formClose();
+  };
+
+  #pointTypeClickHandler = (evt) => {
+    if(evt.target.tagName === 'INPUT'){
+      this.updateElement({
+        type: evt.target.value,
+      });
+    }
+  };
+
+  #offersClickHandler = (evt) => {
+    if(evt.target.tagName === 'INPUT'){
+    }
+  };
+
+  #destinationInputHandler = (evt) => {
+    evt.preventDefault();
+
+    const newDestination = this.#destinations.find((item) => item.name === evt.target.value);
+
+    if(newDestination){
+      this.updateElement({
+        destination: newDestination.id,
+      });
+    }
+  };
+
+  static parseFormToState = (form) => ({...form});
+
+  static parseStateToForm = (state) => ({...state});
 }

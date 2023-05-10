@@ -1,20 +1,18 @@
-import { getRandomNumber, getRandomElement } from '../utils/common.js';
-import { OFFERS, Prices, OffersCount, TYPES } from './constants.js';
+import { getRandomNumber } from '../utils/common.js';
+import { Prices, OffersCount, TYPES } from './constants.js';
 
-const generateOffer = (id) => ({
+const generateOffer = (id, type) => ({
   'id': id,
-  'title': getRandomElement(OFFERS),
+  'title': `Offer for ${type}-${id+1}`,
   'price': getRandomNumber(Prices.MIN, Prices.MAX),
 });
 
-
-const generateOffersByType = (typeId, min = OffersCount.MIN, max = OffersCount.MAX) => ({
+const generateOffersByType = (typeId, isEmpty = false, min = OffersCount.MIN, max = OffersCount.MAX) => ({
   'type': TYPES[typeId],
-  'offers': Array.from({length: getRandomNumber(min, max)}, (value, id) => generateOffer(id)),
+  'offers': isEmpty ? []
+  : Array.from({length: getRandomNumber(min, max)}, (value, id) => generateOffer(id, TYPES[typeId])),
 });
 
 const generateOffersByAllTypes = () => Array.from({length: TYPES.length}, (value, id) => generateOffersByType(id));
 
-const getOffersByType = (type) => generateOffersByAllTypes().find((item) => item.type === type).offers;
-
-export {generateOffersByType, getOffersByType};
+export { generateOffersByType, generateOffersByAllTypes };

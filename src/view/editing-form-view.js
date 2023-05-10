@@ -1,27 +1,21 @@
 import { humanizeFormDate } from '../utils/point.js';
-import { getOffersByType } from '../fish/offers.js';
-import AbstractView from '../framework/view/abstract-view.js';
+import { getOffersByType } from '../utils/common.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 
-const fillOffersList = (checkedItems, allOffers) => {
-  let offers = '';
+const fillOffersList = (checkedOffers, allOffers) => (allOffers.map((offer) => (
+    `<div class="event__offer-selector">
+      <input class="event__offer-checkbox  visually-hidden"
+      id="event-offer-${offer.id}" type="checkbox" name="event-offer-comfort"
+      ${checkedOffers.find((checkedOffer) => checkedOffer.id === offer.id) ? 'checked' : ''}>
+      <label class="event__offer-label" for="event-offer-${offer.id}">
+        <span class="event__offer-title">${offer.title}</span>
+        &plus;&euro;&nbsp;
+        <span class="event__offer-price">${offer.price}</span>
+      </label>
+    </div>`)).join('')
+);
 
-  allOffers.forEach((item) => {
-    const isChecked = checkedItems.find((offer) => offer.id === item.id) ? 'checked' : '';
-
-    offers += `<div class="event__offer-selector">
-    <input class="event__offer-checkbox  visually-hidden" id="event-offer-comfort-1" type="checkbox" name="event-offer-comfort" ${isChecked}>
-    <label class="event__offer-label" for="event-offer-comfort-1">
-      <span class="event__offer-title">${item.title}</span>
-      &plus;&euro;&nbsp;
-      <span class="event__offer-price">${item.price}</span>
-    </label>
-    </div>`;
-  });
-
-  return offers;
-};
-
-const getOffers = (checkedOffers, allOffers) => {
+const getOffersBlock = (checkedOffers, allOffers) => {
   if (allOffers.length === 0){
     return '';
   }
@@ -34,18 +28,10 @@ const getOffers = (checkedOffers, allOffers) => {
     </section>`);
 };
 
-const getAvailableDestinations = (destinations) => {
-  let values = '';
-
-  destinations.forEach((item) => {
-    values += `<option value='${item.name}'></option>`;
-  });
-
-  return (
+const getAvailableDestinations = (destinations) => (
     `<datalist id="destination-list-1">
-      ${values}
+      ${destinations.map((item) =>`<option value='${item.name}'></option>`).join('')}
     </datalist>`);
-};
 
 const getDestinationsList = (thisDestination, destinations, type) => {
   const destinationsByType = destinations.find((item) => item.type === type);
@@ -66,11 +52,8 @@ const getPhotosBlock = (items) => {
     return '';
   }
 
-  let photos = '';
-
-  items.forEach((item) => {
-    photos += `<img class="event__photo" src='${item.src}' alt='${item.description}'></img>`;
-  });
+  const photos = items.map((item) => `<img class="event__photo" src='${item.src}' alt='${item.description}'></img>`).
+  join('');
 
   return (
     `<div class="event__photos-container">
@@ -91,10 +74,10 @@ const getDestinationBlock = (destination) => {
     </section>`);
 };
 
-const createEditingFormTemplate = (form, allDestinations) => {
+const createEditingFormTemplate = (form, allDestinations, offersByType) => {
   const {basePrice, dateFrom, dateTo, destination, offers, type} = form;
 
-  const allOffers = getOffers(offers.offers, getOffersByType(type));
+  const offersBlock = getOffersBlock(offers.offers, offersByType.offers);
 
   const humanizedDateFrom = humanizeFormDate(dateFrom);
   const humanizedDateTo = humanizeFormDate(dateTo);
@@ -193,7 +176,7 @@ const createEditingFormTemplate = (form, allDestinations) => {
       </button>
     </header>
     <section class="event__details">
-      ${allOffers}
+      ${offersBlock}
       ${destinationBlock}
     </section>
   </form>
@@ -201,19 +184,31 @@ const createEditingFormTemplate = (form, allDestinations) => {
   );
 };
 
-export default class EditingFormView extends AbstractView {
-  #form = null;
+export default class EditingFormView extends AbstractStatefulView {
+  _state = null;
   #destinations = null;
+  #allOffers = null;
+  #offersByType = null;
 
-  constructor(form, allDestinatioins){
+  constructor(form, allDestinatioins, allOffers){
     super();
-    this.#form = form;
+    this._state = EditingFormView.parseFormToState(form);
     this.#destinations = allDestinatioins;
+    this.#allOffers = allOffers;
+    this.#offersByType = getOffersByType(allOffers, this._state.type);
+
+    this.#setInnerHandlers();
   }
 
   get template () {
-    return createEditingFormTemplate(this.#form, this.#destinations);
+    return createEditingFormTemplate(this._state, this.#destinations, this.#offersByType);
   }
+
+  reset = (point) => {
+    this.updateElement(
+      EditingFormView.parseFormToState(point),
+    );
+  };
 
   setFormSubmitHandler = (callback) => {
     this._callback.formSubmit = callback;
@@ -225,13 +220,74 @@ export default class EditingFormView extends AbstractView {
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#formCloseHandler);
   };
 
+  _restoreHandlers = () => {
+    this.#setInnerHandlers();
+    this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setFormCloseHandler(this._callback.formClose);
+  };
+
+  #setInnerHandlers = () => {
+    this.element.querySelector('.event__type-list').addEventListener('click', this.#pointTypeClickHandler);
+
+    if(this.#offersByType.length > 0){
+      this.element.querySelector('.event__available-offers').addEventListener('click', this.#offersClickHandler);
+    }
+
+    this.element.querySelector('.event__input--destination').addEventListener('input', this.#destinationInputHandler);
+  };
+
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
-    this._callback.formSubmit(this.#form);
+    this._callback.formSubmit(EditingFormView.parseStateToForm(this._state));
   };
 
   #formCloseHandler = (evt) => {
     evt.preventDefault();
     this._callback.formClose();
   };
+
+  #pointTypeClickHandler = (evt) => {
+    if(evt.target.tagName === 'INPUT'){
+      this.updateElement({
+        type: evt.target.value,
+      });
+    }
+  };
+
+  #offersClickHandler = (evt) => {
+    if(evt.target.tagName === 'INPUT'){
+      evt.preventDefault();
+
+      console.log(evt.target.id.slice(-1));
+
+      //const newOffer = this.#offersByType.find((offer) => offer.id === Number(evt.target.id.slice(-1))).id;
+
+      if(this._state.offers.includes(newOffer)) {
+        this._state.offers = this._state.offers.filter((n) => n !== Number(evt.target.id.slice(-1)));
+      }
+    else {
+      this._state.offers.push(Number(evt.target.id.slice(-1)));
+      }
+
+      this.updateElement({
+        offers: this._state.offers,
+      });
+    };
+  };
+
+  #destinationInputHandler = (evt) => {
+    evt.preventDefault();
+
+    const newDestination = this.#destinations.find((item) => item.name === evt.target.value);
+
+    if(newDestination){
+      this.updateElement({
+        destination: newDestination.id,
+      });
+    }
+  };
+
+  static parseFormToState = (form) => ({...form});
+
+  static parseStateToForm = (state) => ({...state});
 }
