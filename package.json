@@ -34,8 +34,9 @@
     "node": "16"
   },
   "dependencies": {
-    "dayjs": "^1.11.7",
-    "duration": "^0.2.2",
+    "dayjs": "1.11.7",
+    "duration": "0.2.2",
+    "flatpickr": "4.6.13",
     "webpack": "5.62.1"
   }
 }

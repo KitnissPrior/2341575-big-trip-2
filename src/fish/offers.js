@@ -10,7 +10,7 @@ const generateOffer = (id, type) => ({
 const generateOffersByType = (typeId, isEmpty = false, min = OffersCount.MIN, max = OffersCount.MAX) => ({
   'type': TYPES[typeId],
   'offers': isEmpty ? []
-  : Array.from({length: getRandomNumber(min, max)}, (value, id) => generateOffer(id, TYPES[typeId])),
+    : Array.from({length: getRandomNumber(min, max)}, (value, id) => generateOffer(id, TYPES[typeId])),
 });
 
 const generateOffersByAllTypes = () => Array.from({length: TYPES.length}, (value, id) => generateOffersByType(id));

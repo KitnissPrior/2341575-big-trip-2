@@ -1,4 +1,4 @@
-import { generateOffersByAllTypes } from "../fish/offers";
+import { generateOffersByAllTypes } from '../fish/offers';
 
 export default class OffersModel{
   #offers = null;

@@ -1,4 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
+import EditingFormView from './editing-form-view.js';
 
 const createNewFormTemplate = () => (
   `<li class="trip-events__item">
@@ -206,9 +207,9 @@ export default class NewFormView extends AbstractView {
   #setInnerHandlers = () => {
     this.element.querySelector('.event__type-list').addEventListener('click', this.#pointTypeClickHandler);
 
-    if(this._state && this._state.offers.offers.length && this.#allOffers.length){
+    /*if(this._state && this._state.offers.offers.length && this.#allOffers.length){
       this.element.querySelector('.event__available-offers').addEventListener('click', this.#offersClickHandler);
-    }
+    }*/
 
     this.element.querySelector('.event__input--destination').addEventListener('input', this.#destinationInputHandler);
   };
@@ -231,10 +232,11 @@ export default class NewFormView extends AbstractView {
     }
   };
 
-  #offersClickHandler = (evt) => {
+  /*#offersClickHandler = (evt) => {
     if(evt.target.tagName === 'INPUT'){
+
     }
-  };
+  };*/
 
   #destinationInputHandler = (evt) => {
     evt.preventDefault();

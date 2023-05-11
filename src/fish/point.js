@@ -6,7 +6,7 @@ import {nanoid} from 'nanoid';
 import { generateDestination } from '../fish/destination';
 
 export const generatePoint = () => {
-  const typeId = getRandomNumber(0, TYPES.length-1)
+  const typeId = getRandomNumber(0, TYPES.length-1);
   const type = TYPES[typeId];
   const dateFrom = generateDate();
   const destinations = Array.from({length: DESTINATIONS.length}, (value, index) => generateDestination(index));
