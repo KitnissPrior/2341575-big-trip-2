@@ -5,11 +5,11 @@ import flatpickr from 'flatpickr';
 
 import 'flatpickr/dist/flatpickr.min.css';
 
-const fillOffersList = (checkedOffers, allOffers) => (allOffers.map((offer) => (
+const fillOffersList = (checkedOfferIds, allOffers) => (allOffers.map((offer) => (
   `<div class="event__offer-selector">
       <input class="event__offer-checkbox  visually-hidden"
       id="event-offer-${offer.id}" type="checkbox" name="event-offer-comfort"
-      ${checkedOffers.find((checkedOffer) => checkedOffer.id === offer.id) ? 'checked' : ''}>
+      ${checkedOfferIds.includes(offer.id) ? 'checked' : ''}>
       <label class="event__offer-label" for="event-offer-${offer.id}">
         <span class="event__offer-title">${offer.title}</span>
         &plus;&euro;&nbsp;
@@ -80,7 +80,7 @@ const getDestinationBlock = (destination) => {
 const createEditingFormTemplate = (form, allDestinations, offersByType) => {
   const {basePrice, dateFrom, dateTo, destination, offers, type} = form;
 
-  const offersBlock = getOffersBlock(offers.offers, offersByType.offers);
+  const offersBlock = getOffersBlock(offers, offersByType.offers);
 
   const isSubmitDisabled = dateFrom === null || dateTo === null;
 
@@ -253,7 +253,7 @@ export default class EditingFormView extends AbstractStatefulView {
   #setInnerHandlers = () => {
     this.element.querySelector('.event__type-list').addEventListener('click', this.#pointTypeClickHandler);
 
-    if(this.#offersByType.length > 0){
+    if(this.#offersByType.offers.length > 0){
       this.element.querySelector('.event__available-offers').addEventListener('click', this.#offersClickHandler);
     }
 
@@ -307,13 +307,13 @@ export default class EditingFormView extends AbstractStatefulView {
     if(evt.target.tagName === 'INPUT'){
       evt.preventDefault();
 
-      const newOffer = this.#offersByType.find((offer) => offer.id === Number(evt.target.id.slice(-1))).id;
+      const newOfferId = Number(evt.target.id.slice(-1));
 
-      if(this._state.offers.includes(newOffer)) {
-        this._state.offers = this._state.offers.filter((n) => n !== Number(evt.target.id.slice(-1)));
+      if(this._state.offers.includes(newOfferId)) {
+        this._state.offers = this._state.offers.filter((id) => id !== newOfferId);
       }
       else {
-        this._state.offers.push(Number(evt.target.id.slice(-1)));
+        this._state.offers.push(newOfferId);
       }
 
       this.updateElement({

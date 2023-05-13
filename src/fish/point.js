@@ -1,17 +1,15 @@
 import { getRandomNumber, getRandomElement } from '../utils/common.js';
-import { generateOffersByType } from './offers.js';
-import { TYPES, Prices, DESTINATIONS} from './constants.js';
+import { Prices } from './constants.js';
 import { generateDate } from './dates.js';
 import {nanoid} from 'nanoid';
-import { generateDestination } from '../fish/destination';
+import { destinations } from '../fish/destination';
+import { allOffers } from './offers.js';
 
 export const generatePoint = () => {
-  const typeId = getRandomNumber(0, TYPES.length-1);
-  const type = TYPES[typeId];
   const dateFrom = generateDate();
-  const destinations = Array.from({length: DESTINATIONS.length}, (value, index) => generateDestination(index));
-  const isEmptyOffers = getRandomNumber(0, TYPES.length) > TYPES.length - 3;
-
+  const offersByType = getRandomElement(allOffers);
+  const offersTotalCount = offersByType.offers.length;
+  const offersCount = offersTotalCount > 2? getRandomNumber(2, offersTotalCount) : offersTotalCount;
 
   return ({
     'basePrice': getRandomNumber(Prices.MIN, Prices.MAX),
@@ -20,7 +18,7 @@ export const generatePoint = () => {
     'destination': getRandomElement(destinations).id,
     'id': nanoid(),
     'isFavourite': Boolean(getRandomNumber(0,1)),
-    'offers': generateOffersByType(typeId, isEmptyOffers),
-    type,
+    'offers': offersByType.offers.map((offer) => offer.id).slice(0, offersCount),
+    'type': offersByType.type,
   });
 };

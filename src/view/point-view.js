@@ -3,15 +3,15 @@ import { getOffersByType } from '../utils/common.js';
 import AbstractView from '../framework/view/abstract-view.js';
 import OffersView from './offers-view.js';
 
-const getOffersBlock = (checkedOffers, allOffers) => {
-  if (allOffers.length === 0 || checkedOffers.length === 0){
+const getOffersBlock = (checkedOfferIds, allOffers) => {
+  if (allOffers.length === 0 || checkedOfferIds.length === 0){
     return '';
   }
 
   let offers = '';
 
-  allOffers.offers.forEach((offer) => {
-    if (checkedOffers.find((checkedOffer) => checkedOffer.id === offer.id)){
+  allOffers.forEach((offer) => {
+    if (checkedOfferIds.includes(offer.id)){
       offers += `<li class="event__offer">
       <span class="event__offer-title">${offer.title}</span>
       &plus;&euro;&nbsp;
@@ -28,7 +28,7 @@ const createPointTemplate = (point, availableDestinations, allOffers) => {
 
   const hasStar = isFavourite? 'event__favorite-btn--active' : '';
 
-  const offersBlock = getOffersBlock(offers.offers, getOffersByType(allOffers, type));
+  const offersBlock = getOffersBlock(offers, getOffersByType(allOffers, type).offers);
 
   const humanizedDate = humanizePointDay(dateFrom);
   const timeFrom = humanizePointTime(dateFrom);
