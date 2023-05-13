@@ -1,4 +1,8 @@
 import AbstractView from '../framework/view/abstract-view.js';
+import { getOffersByType } from '../utils/common.js';
+import flatpickr from 'flatpickr';
+
+import 'flatpickr/dist/flatpickr.min.css';
 
 const createNewFormTemplate = () => (
   `<li class="trip-events__item">
@@ -169,7 +173,7 @@ export default class NewFormView extends AbstractView {
   #destinations = null;
   #allOffers = null;
   #offersByType = null;
-  
+
   #datepickerFrom = null;
   #datepickerTo = null;
 
