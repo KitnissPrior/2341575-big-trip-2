@@ -168,13 +168,10 @@ export default class NewFormView extends AbstractView {
   _state = null;
   #destinations = null;
   #allOffers = null;
-
-  __state = null;
-  #destinations = null;
-  #allOffers = null;
+  #offersByType = null;
+  
   #datepickerFrom = null;
   #datepickerTo = null;
-  #offersByType = null;
 
   constructor(form, allDestinatioins, allOffers){
     super();
