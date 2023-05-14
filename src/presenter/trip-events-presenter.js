@@ -29,11 +29,11 @@ export default class TripEventsPresenter {
     this.#eventsList = new EventsView();
   }
 
-  init (tripContainer, pointsModel, destinationsModel, offersModel) {
+  init (tripContainer, pointsModel) {
     this.#tripContainer = tripContainer;
     this.#pointsModel = pointsModel;
-    this.#destinations = destinationsModel.destinations;
-    this.#offers = offersModel.offers;
+    this.#destinations = pointsModel.destinations;
+    this.#offers = pointsModel.offers;
 
     const pointsSortedByDefault = [...this.#pointsModel.points].sort(sortPointsByDay);
 

@@ -1,18 +1,21 @@
 import { humanizeFormDate } from '../utils/point.js';
 import { getOffersByType } from '../utils/common.js';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
+import flatpickr from 'flatpickr';
 
-const fillOffersList = (checkedOffers, allOffers) => (allOffers.map((offer) => (
-    `<div class="event__offer-selector">
+import 'flatpickr/dist/flatpickr.min.css';
+
+const fillOffersList = (checkedOfferIds, allOffers) => (allOffers.map((offer) => (
+  `<div class="event__offer-selector">
       <input class="event__offer-checkbox  visually-hidden"
       id="event-offer-${offer.id}" type="checkbox" name="event-offer-comfort"
-      ${checkedOffers.find((checkedOffer) => checkedOffer.id === offer.id) ? 'checked' : ''}>
+      ${checkedOfferIds.includes(offer.id) ? 'checked' : ''}>
       <label class="event__offer-label" for="event-offer-${offer.id}">
         <span class="event__offer-title">${offer.title}</span>
         &plus;&euro;&nbsp;
         <span class="event__offer-price">${offer.price}</span>
       </label>
-    </div>`)).join('')
+  </div>`)).join('')
 );
 
 const getOffersBlock = (checkedOffers, allOffers) => {
@@ -29,9 +32,9 @@ const getOffersBlock = (checkedOffers, allOffers) => {
 };
 
 const getAvailableDestinations = (destinations) => (
-    `<datalist id="destination-list-1">
+  `<datalist id="destination-list-1">
       ${destinations.map((item) =>`<option value='${item.name}'></option>`).join('')}
-    </datalist>`);
+  </datalist>`);
 
 const getDestinationsList = (thisDestination, destinations, type) => {
   const destinationsByType = destinations.find((item) => item.type === type);
@@ -53,7 +56,7 @@ const getPhotosBlock = (items) => {
   }
 
   const photos = items.map((item) => `<img class="event__photo" src='${item.src}' alt='${item.description}'></img>`).
-  join('');
+    join('');
 
   return (
     `<div class="event__photos-container">
@@ -77,7 +80,9 @@ const getDestinationBlock = (destination) => {
 const createEditingFormTemplate = (form, allDestinations, offersByType) => {
   const {basePrice, dateFrom, dateTo, destination, offers, type} = form;
 
-  const offersBlock = getOffersBlock(offers.offers, offersByType.offers);
+  const offersBlock = getOffersBlock(offers, offersByType.offers);
+
+  const isSubmitDisabled = dateFrom === null || dateTo === null;
 
   const humanizedDateFrom = humanizeFormDate(dateFrom);
   const humanizedDateTo = humanizeFormDate(dateTo);
@@ -169,7 +174,7 @@ const createEditingFormTemplate = (form, allDestinations, offersByType) => {
         <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value=${basePrice}>
       </div>
 
-      <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
+      <button class="event__save-btn  btn  btn--blue" type="submit" ${isSubmitDisabled ? 'disabled' : ''}>Save</button>
       <button class="event__reset-btn" type="reset">Delete</button>
       <button class="event__rollup-btn" type="button">
         <span class="visually-hidden">Open event</span>
@@ -188,6 +193,8 @@ export default class EditingFormView extends AbstractStatefulView {
   _state = null;
   #destinations = null;
   #allOffers = null;
+  #datepickerFrom = null;
+  #datepickerTo = null;
   #offersByType = null;
 
   constructor(form, allDestinatioins, allOffers){
@@ -195,14 +202,28 @@ export default class EditingFormView extends AbstractStatefulView {
     this._state = EditingFormView.parseFormToState(form);
     this.#destinations = allDestinatioins;
     this.#allOffers = allOffers;
-    this.#offersByType = getOffersByType(allOffers, this._state.type);
+    this.#offersByType = getOffersByType(this.#allOffers, this._state.type);
 
     this.#setInnerHandlers();
+    this.#setDatepickerDateFrom();
+    this.#setDatepickerDateTo();
   }
 
   get template () {
     return createEditingFormTemplate(this._state, this.#destinations, this.#offersByType);
   }
+
+  removeElement = () => {
+    super.removeElement();
+
+    if (this.#datepickerFrom && this.#datepickerTo) {
+      this.#datepickerFrom.destroy();
+      this.#datepickerTo.destroy();
+
+      this.#datepickerFrom = null;
+      this.#datepickerTo = null;
+    }
+  };
 
   reset = (point) => {
     this.updateElement(
@@ -224,16 +245,44 @@ export default class EditingFormView extends AbstractStatefulView {
     this.#setInnerHandlers();
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setFormCloseHandler(this._callback.formClose);
+
+    this.#setDatepickerDateFrom();
+    this.#setDatepickerDateTo();
   };
 
   #setInnerHandlers = () => {
     this.element.querySelector('.event__type-list').addEventListener('click', this.#pointTypeClickHandler);
 
-    if(this.#offersByType.length > 0){
+    if(this.#offersByType.offers.length > 0){
       this.element.querySelector('.event__available-offers').addEventListener('click', this.#offersClickHandler);
     }
 
     this.element.querySelector('.event__input--destination').addEventListener('input', this.#destinationInputHandler);
+  };
+
+  #setDatepickerDateFrom = () => {
+    this.#datepickerFrom = flatpickr(
+      this.element.querySelector('#event-start-time-1'),
+      {
+        dateFormat: 'd/m/y H:i',
+        enableTime: true,
+        defaultDate: this._state.dateFrom,
+        onChange: this.#dateFromChangeHandler,
+      },
+    );
+  };
+
+  #setDatepickerDateTo = () => {
+    this.#datepickerTo = flatpickr(
+      this.element.querySelector('#event-end-time-1'),
+      {
+        dateFormat: 'd/m/y H:i',
+        enableTime: true,
+        defaultDate: this._state.dateTo,
+        minDate: this._state.dateFrom,
+        onChange: this.#dateToChangeHandler,
+      },
+    );
   };
 
   #formSubmitHandler = (evt) => {
@@ -258,21 +307,31 @@ export default class EditingFormView extends AbstractStatefulView {
     if(evt.target.tagName === 'INPUT'){
       evt.preventDefault();
 
-      console.log(evt.target.id.slice(-1));
+      const newOfferId = Number(evt.target.id.slice(-1));
 
-      //const newOffer = this.#offersByType.find((offer) => offer.id === Number(evt.target.id.slice(-1))).id;
-
-      if(this._state.offers.includes(newOffer)) {
-        this._state.offers = this._state.offers.filter((n) => n !== Number(evt.target.id.slice(-1)));
+      if(this._state.offers.includes(newOfferId)) {
+        this._state.offers = this._state.offers.filter((id) => id !== newOfferId);
       }
-    else {
-      this._state.offers.push(Number(evt.target.id.slice(-1)));
+      else {
+        this._state.offers.push(newOfferId);
       }
 
       this.updateElement({
         offers: this._state.offers,
       });
-    };
+    }
+  };
+
+  #dateFromChangeHandler = ([date]) => {
+    this.updateElement({
+      dateFrom: date,
+    });
+  };
+
+  #dateToChangeHandler = ([date]) => {
+    this.updateElement({
+      dateTo: date,
+    });
   };
 
   #destinationInputHandler = (evt) => {
