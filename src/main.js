@@ -1,17 +1,34 @@
-import {render} from './framework/render.js';
-import {generateFilter} from './fish/filter.js';
-import FiltersView from './view/filters-view.js';
 import TripEventsPresenter from './presenter/trip-events-presenter.js';
+import FilterPresenter from './presenter/filter-presenter.js';
 import PointsModel from './model/points-model.js';
+import OffersModel from './model/offers-model.js';
+import DestinationsModel from './model/destinations-model.js';
+import FilterModel from './model/filter-model.js';
 
 const siteHeaderElement = document.querySelector('.trip-main');
-const siteMainElement = document.querySelector('.page-main');
-const tripPresenter = new TripEventsPresenter();
+const siteMainElement = document.querySelector('.trip-events');
+const newEventButton = siteHeaderElement.querySelector('.trip-main__event-add-btn');
 
 const pointsModel = new PointsModel();
+const offersModel = new OffersModel();
+const destinationsModel = new DestinationsModel();
+const filtersModel = new FilterModel();
 
-const filters = generateFilter(pointsModel.points);
+const filterPresenter = new FilterPresenter(siteHeaderElement.querySelector('.trip-controls__filters'),
+  filtersModel, pointsModel);
+const tripPresenter = new TripEventsPresenter(siteMainElement,
+  pointsModel, offersModel, destinationsModel, filtersModel);
 
-render(new FiltersView(filters), siteHeaderElement.querySelector('.trip-controls__filters'));
+const handleNewFormClose = () => {
+  newEventButton.disabled = false;
+};
 
-tripPresenter.init(siteMainElement.querySelector('.trip-events'), pointsModel);
+const handleNewEventButtonClick = () => {
+  tripPresenter.createNewForm(handleNewFormClose);
+  newEventButton.disabled = true;
+};
+
+newEventButton.addEventListener('click', handleNewEventButtonClick);
+
+tripPresenter.init();
+filterPresenter.init();

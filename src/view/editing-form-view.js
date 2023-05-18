@@ -1,7 +1,9 @@
+import he from 'he';
 import { humanizeFormDate } from '../utils/point.js';
-import { getOffersByType } from '../utils/common.js';
+import { getOffersByType, capitalizeFirstLetter } from '../utils/common.js';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import flatpickr from 'flatpickr';
+import { EVENT_TYPES } from '../const.js';
 
 import 'flatpickr/dist/flatpickr.min.css';
 
@@ -45,10 +47,23 @@ const getDestinationsList = (thisDestination, destinations, type) => {
     <label class="event__label  event__type-output" for="event-destination-1">
     ${type}
     </label>
-    <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value='${thisDestination}' list="destination-list-1">
+    <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value='${he.encode(thisDestination)}' list="destination-list-1">
     ${getAvailableDestinations(allDestinatioins)}
     </div>`);
 };
+
+const getEventTypesList = (currentType) => (
+  EVENT_TYPES.map((eventType) => {
+    const isChecked = eventType === currentType ? 'checked' : '';
+
+    return (
+      `<div class="event__type-item">
+        <input id="event-type-${eventType}-1" class="event__type-input  visually-hidden" 
+        type="radio" name="event-type" value="${eventType}" ${isChecked}>
+          <label class="event__type-label  event__type-label--${eventType}" for="event-type-${eventType}-1">${capitalizeFirstLetter(eventType)}</label>
+      </div>`);
+  }).join('')
+);
 
 const getPhotosBlock = (items) => {
   if (items === null){
@@ -84,6 +99,8 @@ const createEditingFormTemplate = (form, allDestinations, offersByType) => {
 
   const isSubmitDisabled = dateFrom === null || dateTo === null;
 
+  const eventTypesList = getEventTypesList(type);
+
   const humanizedDateFrom = humanizeFormDate(dateFrom);
   const humanizedDateTo = humanizeFormDate(dateTo);
 
@@ -108,52 +125,8 @@ const createEditingFormTemplate = (form, allDestinations, offersByType) => {
 
         <div class="event__type-list">
           <fieldset class="event__type-group">
-            <legend class="visually-hidden">Event type</legend>
-
-            <div class="event__type-item">
-              <input id="event-type-taxi-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="taxi">
-              <label class="event__type-label  event__type-label--taxi" for="event-type-taxi-1">Taxi</label>
-            </div>
-
-            <div class="event__type-item">
-              <input id="event-type-bus-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="bus">
-              <label class="event__type-label  event__type-label--bus" for="event-type-bus-1">Bus</label>
-            </div>
-
-            <div class="event__type-item">
-              <input id="event-type-train-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="train">
-              <label class="event__type-label  event__type-label--train" for="event-type-train-1">Train</label>
-            </div>
-
-            <div class="event__type-item">
-              <input id="event-type-ship-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="ship">
-              <label class="event__type-label  event__type-label--ship" for="event-type-ship-1">Ship</label>
-            </div>
-
-            <div class="event__type-item">
-              <input id="event-type-drive-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="drive">
-              <label class="event__type-label  event__type-label--drive" for="event-type-drive-1">Drive</label>
-            </div>
-
-            <div class="event__type-item">
-              <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight" checked>
-              <label class="event__type-label  event__type-label--flight" for="event-type-flight-1">Flight</label>
-            </div>
-
-            <div class="event__type-item">
-              <input id="event-type-check-in-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="check-in">
-              <label class="event__type-label  event__type-label--check-in" for="event-type-check-in-1">Check-in</label>
-            </div>
-
-            <div class="event__type-item">
-              <input id="event-type-sightseeing-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="sightseeing">
-              <label class="event__type-label  event__type-label--sightseeing" for="event-type-sightseeing-1">Sightseeing</label>
-            </div>
-
-            <div class="event__type-item">
-              <input id="event-type-restaurant-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="restaurant">
-              <label class="event__type-label  event__type-label--restaurant" for="event-type-restaurant-1">Restaurant</label>
-            </div>
+          <legend class="visually-hidden">Event type</legend>
+          ${eventTypesList}
           </fieldset>
         </div>
       </div>
@@ -197,10 +170,10 @@ export default class EditingFormView extends AbstractStatefulView {
   #datepickerTo = null;
   #offersByType = null;
 
-  constructor(form, allDestinatioins, allOffers){
+  constructor(form, allDestinations, allOffers){
     super();
     this._state = EditingFormView.parseFormToState(form);
-    this.#destinations = allDestinatioins;
+    this.#destinations = allDestinations;
     this.#allOffers = allOffers;
     this.#offersByType = getOffersByType(this.#allOffers, this._state.type);
 
@@ -241,10 +214,17 @@ export default class EditingFormView extends AbstractStatefulView {
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#formCloseHandler);
   };
 
+  setDeleteClickHandler = (callback) => {
+    this._callback.deleteClick = callback;
+    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#formDeleteClickHandler);
+  };
+
   _restoreHandlers = () => {
     this.#setInnerHandlers();
+
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setFormCloseHandler(this._callback.formClose);
+    this.setDeleteClickHandler(this._callback.deleteClick);
 
     this.#setDatepickerDateFrom();
     this.#setDatepickerDateTo();
@@ -257,6 +237,7 @@ export default class EditingFormView extends AbstractStatefulView {
       this.element.querySelector('.event__available-offers').addEventListener('click', this.#offersClickHandler);
     }
 
+    this.element.querySelector('.event__input--price').addEventListener('input', this.#priceInputHandler);
     this.element.querySelector('.event__input--destination').addEventListener('input', this.#destinationInputHandler);
   };
 
@@ -267,6 +248,7 @@ export default class EditingFormView extends AbstractStatefulView {
         dateFormat: 'd/m/y H:i',
         enableTime: true,
         defaultDate: this._state.dateFrom,
+        minDate: this._state.dateFrom,
         onChange: this.#dateFromChangeHandler,
       },
     );
@@ -285,6 +267,8 @@ export default class EditingFormView extends AbstractStatefulView {
     );
   };
 
+  #updateOffersByType(newType) {this.#offersByType = getOffersByType(this.#allOffers, newType);}
+
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
     this._callback.formSubmit(EditingFormView.parseStateToForm(this._state));
@@ -295,10 +279,18 @@ export default class EditingFormView extends AbstractStatefulView {
     this._callback.formClose();
   };
 
+  #formDeleteClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.deleteClick(EditingFormView.parseStateToForm(this._state));
+  };
+
   #pointTypeClickHandler = (evt) => {
     if(evt.target.tagName === 'INPUT'){
+      this.#updateOffersByType(evt.target.value);
+
       this.updateElement({
         type: evt.target.value,
+        offers: [],
       });
     }
   };
@@ -342,6 +334,18 @@ export default class EditingFormView extends AbstractStatefulView {
     if(newDestination){
       this.updateElement({
         destination: newDestination.id,
+      });
+    }
+  };
+
+  #priceInputHandler = (evt) => {
+    evt.preventDefault();
+
+    const newPrice = Number(evt.target.value);
+
+    if(Number.isFinite(newPrice) && newPrice >= 0) {
+      this._setState({
+        basePrice: newPrice,
       });
     }
   };
