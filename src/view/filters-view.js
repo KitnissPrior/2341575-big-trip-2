@@ -1,7 +1,7 @@
 import AbstractView from '../framework/view/abstract-view.js';
 
-const createFilterItemTemplate = (filter, isChecked) => {
-  const {name, isPoints } = filter;
+const createFilterItemTemplate = (filter, currentFilter) => {
+  const {type, name, count } = filter;
 
   return (
     `<div class="trip-filters__filter">
@@ -9,17 +9,17 @@ const createFilterItemTemplate = (filter, isChecked) => {
       class="trip-filters__filter-input  visually-hidden" 
       type="radio" 
       name="trip-filter" 
-      ${isChecked ? 'checked' : ''}
-      ${isPoints ? '' : 'disabled'}
-      value=${name}>
+      ${type === currentFilter ? 'checked' : ''}
+      ${count > 0 ? '' : 'disabled'}
+      value=${type}>
       <label class="trip-filters__filter-label" for="filter-${name}">${name}</label>
     </div>`
   );
 };
 
-const createFiltersTemplate = (filterItems) => {
+const createFiltersTemplate = (filterItems, currentFilter) => {
   const filterItemsTemplate = Array.from(filterItems)
-    .map((name, isPoints) => createFilterItemTemplate(name, isPoints))
+    .map((filter) => createFilterItemTemplate(filter, currentFilter))
     .join('');
 
   return(
@@ -30,15 +30,27 @@ const createFiltersTemplate = (filterItems) => {
   );
 };
 
-export default class FiltersView extends AbstractView {
+export default class FilterView extends AbstractView {
   #filters = null;
+  #currentFilter = null;
 
-  constructor(filters) {
+  constructor(filters, currentFilterType) {
     super();
     this.#filters = filters;
+    this.#currentFilter = currentFilterType;
   }
 
   get template () {
-    return createFiltersTemplate(this.#filters);
+    return createFiltersTemplate(this.#filters, this.#currentFilter);
   }
+
+  setFilterTypeChangeHandler = (callback) => {
+    this._callback.filterTypeChange = callback;
+    this.element.addEventListener('change', this.#filterTypeChangeHandler);
+  };
+
+  #filterTypeChangeHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.filterTypeChange(evt.target.value);
+  };
 }

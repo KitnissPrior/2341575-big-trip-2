@@ -1,6 +1,6 @@
 const TYPES = ['taxi', 'bus', 'train', 'ship','drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
 
-const POINTS_COUNT = 10;
+const POINTS_COUNT = 5;
 
 const DESTINATIONS = [
   'Praha',

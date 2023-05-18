@@ -1,22 +1,54 @@
 import { generatePoint } from '../fish/point.js';
 import { POINTS_COUNT } from '../fish/constants.js';
-import { allOffers } from '../fish/offers.js';
-import { destinations } from '../fish/destination.js';
+import Obserbvable from '../framework/observable.js';
 
-export default class PointsModel{
+export default class PointsModel extends Obserbvable {
   #points = null;
-  #offers = null;
-  #destinations = null;
 
-  constructor (){
+  constructor () {
+    super();
     this.#points = Array.from({length: POINTS_COUNT}, generatePoint);
-    this.#offers = allOffers;
-    this.#destinations = destinations;
   }
 
   get points () { return this.#points;}
 
-  get destinations () {return this.#destinations;}
+  updatePoint = (updateType, update) => {
+    const index = this.#points.findIndex((point) => point.id === update.id);
 
-  get offers () {return this.#offers;}
+    if (index === -1) {
+      throw new Error('Can\'t update unexisting point');
+    }
+
+    this.#points = [
+      ...this.#points.slice(0, index),
+      update,
+      ...this.#points.slice(index + 1),
+    ];
+
+    this._notify(updateType, update);
+  };
+
+  addPoint= (updateType, update) => {
+    this.#points = [
+      update,
+      ...this.#points,
+    ];
+
+    this._notify(updateType, update);
+  };
+
+  deletePoint = (updateType, update) => {
+    const index = this.#points.findIndex((point) => point.id === update.id);
+
+    if (index === -1) {
+      throw new Error('Can\'t delete unexisting point');
+    }
+
+    this.#points = [
+      ...this.#points.slice(0, index),
+      ...this.#points.slice(index + 1),
+    ];
+
+    this._notify(updateType);
+  };
 }
