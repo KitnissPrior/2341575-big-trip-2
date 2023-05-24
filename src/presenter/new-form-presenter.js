@@ -46,7 +46,7 @@ export default class NewFormPresenter {
       return;
     }
 
-    this.#destroyCallback();
+    this.#destroyCallback?.();
 
     remove(this.#newFormComponent);
     this.#newFormComponent = null;

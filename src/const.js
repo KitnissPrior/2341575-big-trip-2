@@ -24,5 +24,6 @@ const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
+  INIT: 'INIT',
 };
 export { SortType, FilterType, UserAction, UpdateType, EVENT_TYPES };

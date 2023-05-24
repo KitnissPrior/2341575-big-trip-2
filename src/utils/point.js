@@ -44,7 +44,7 @@ const getWeightForNullDate = (dateA, dateB) => {
   return null;
 };
 
-const getWrightForTwoNullDates = (pointA, pointB) => {
+const getWeightForTwoNullDates = (pointA, pointB) => {
   const weightA = getWeightForNullDate(pointA.dateFrom, pointA.dateTo);
   const weightB = getWeightForNullDate(pointB.dateFrom, pointB.dateTo);
 
@@ -58,7 +58,7 @@ const sortPointsByDay = (pointA, pointB) => {
 };
 
 const sortPointsByTime = (pointA, pointB) => {
-  const weight = getWrightForTwoNullDates(pointA, pointB);
+  const weight = getWeightForTwoNullDates(pointA, pointB);
 
   const timeA = dayjs(pointA.dateTo).diff(dayjs(pointA.dateFrom));
   const timeB = dayjs(pointB.dateTo).diff(dayjs(pointB.dateFrom));
