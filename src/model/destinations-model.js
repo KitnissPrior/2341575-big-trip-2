@@ -1,18 +1,24 @@
-import { destinations } from '../fish/destination.js';
 import Obserbvable from '../framework/observable.js';
+import { UpdateType } from '../const.js';
 
 export default class DestinationsModel extends Obserbvable {
-  #destinations = null;
+  #destinations = [];
+  #pointsApiService = null;
 
-  constructor () {
+  constructor (pointsApiService) {
     super();
-    this.#destinations = destinations;
+    this.#pointsApiService = pointsApiService;
   }
 
   get destinations () {return this.#destinations;}
 
-  setDestinations(updateType, newDestinations) {
-    this.#destinations = newDestinations;
-    this._notify(updateType, destinations);
-  }
+  init = async () => {
+    try {
+      this.#destinations = await this.#pointsApiService.destinations;
+    } catch(err) {
+      this.#destinations = [];
+    }
+
+    this._notify(UpdateType.INIT);
+  };
 }

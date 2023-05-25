@@ -1,18 +1,25 @@
-import { allOffers } from '../fish/offers.js';
 import Obserbvable from '../framework/observable.js';
+import { UpdateType } from '../const.js';
 
 export default class OffersModel extends Obserbvable {
-  #offers = null;
+  #offers = [];
+  #pointsApiService = null;
 
-  constructor () {
+  constructor (pointsApiService) {
     super();
-    this.#offers = allOffers;
+    this.#pointsApiService = pointsApiService;
   }
+
+  init = async () => {
+    try {
+      this.#offers = await this.#pointsApiService.offers;
+    } catch(err) {
+      this.#offers = [];
+    }
+
+    this._notify(UpdateType.INIT);
+  };
 
   get offers () {return this.#offers;}
 
-  setOffers(updateType, newOffers) {
-    this.#offers = newOffers;
-    this._notify(updateType, newOffers);
-  }
 }
