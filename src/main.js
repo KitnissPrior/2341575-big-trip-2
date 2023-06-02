@@ -6,7 +6,7 @@ import DestinationsModel from './model/destinations-model.js';
 import FilterModel from './model/filter-model.js';
 import PointsApiService from './points-api-service.js';
 
-const AUTHORIZATION = 'Basic fiyq9ygu563sda35hs7vsm';
+const AUTHORIZATION = 'Basic fiyq9ygu563sda35hvsm';
 const END_POINT = 'https://18.ecmascript.pages.academy/big-trip/';
 
 const siteHeaderElement = document.querySelector('.trip-main');
