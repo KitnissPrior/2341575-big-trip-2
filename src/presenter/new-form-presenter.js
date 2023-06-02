@@ -2,7 +2,6 @@ import NewFormView from '../view/new-form-view.js';
 import { render, remove, RenderPosition } from '../framework/render.js';
 import { isEscape } from '../utils/common.js';
 import { UserAction, UpdateType, EVENT_TYPES } from '../const.js';
-import { nanoid } from 'nanoid';
 import dayjs from 'dayjs';
 
 export default class NewFormPresenter {
@@ -54,8 +53,27 @@ export default class NewFormPresenter {
     document.removeEventListener('keydown', this.#escKeyDownHandler);
   };
 
+  setSaving = () => {
+    this.#newFormComponent.updateElement({
+      isDisabled: true,
+      isSaving: true,
+    });
+  };
+
+  setAborting = () => {
+    const resetFormState = () => {
+      this.#newFormComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this.#newFormComponent.shake(resetFormState);
+  };
+
   #getBlankForm = () => ({
-    'basePrice': 0,
+    'basePrice': 1,
     'dateFrom': dayjs().toDate(),
     'dateTo': dayjs().toDate(),
     'destination': this.#destinations[0].id,
@@ -69,10 +87,8 @@ export default class NewFormPresenter {
     this.#changeData(
       UserAction.ADD_POINT,
       UpdateType.MINOR,
-      {id: nanoid(), ...point},
+      point,
     );
-
-    this.destroy();
   };
 
   #handleDeleteClick = () => this.destroy();

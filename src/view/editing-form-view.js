@@ -7,11 +7,12 @@ import { EVENT_TYPES } from '../const.js';
 
 import 'flatpickr/dist/flatpickr.min.css';
 
-const fillOffersList = (checkedOfferIds, allOffers) => (allOffers.map((offer) => (
+const fillOffersList = (checkedOfferIds, allOffers, isDisabled) => (allOffers.map((offer) => (
   `<div class="event__offer-selector">
       <input class="event__offer-checkbox  visually-hidden"
       id="event-offer-${offer.id}" type="checkbox" name="event-offer-comfort"
-      ${checkedOfferIds.includes(offer.id) ? 'checked' : ''}>
+      ${checkedOfferIds.includes(offer.id) ? 'checked' : ''}
+      ${isDisabled ? 'disabled' : ''}>
       <label class="event__offer-label" for="event-offer-${offer.id}">
         <span class="event__offer-title">${offer.title}</span>
         &plus;&euro;&nbsp;
@@ -20,7 +21,7 @@ const fillOffersList = (checkedOfferIds, allOffers) => (allOffers.map((offer) =>
   </div>`)).join('')
 );
 
-const getOffersBlock = (checkedOffers, allOffers) => {
+const getOffersBlock = (checkedOffers, allOffers, isDisabled) => {
   if (allOffers.length === 0){
     return '';
   }
@@ -28,7 +29,7 @@ const getOffersBlock = (checkedOffers, allOffers) => {
   return (`<section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
     <div class="event__available-offers">
-      ${fillOffersList(checkedOffers, allOffers)}
+      ${fillOffersList(checkedOffers, allOffers, isDisabled)}
     </div>
     </section>`);
 };
@@ -93,9 +94,19 @@ const getDestinationBlock = (destination) => {
 };
 
 const createEditingFormTemplate = (form, allDestinations, offersByType) => {
-  const {basePrice, dateFrom, dateTo, destination, offers, type} = form;
+  const {
+    basePrice,
+    dateFrom,
+    dateTo,
+    destination,
+    offers,
+    type,
+    isDisabled,
+    isSaving,
+    isDeleting
+  } = form;
 
-  const offersBlock = getOffersBlock(offers, offersByType.offers);
+  const offersBlock = getOffersBlock(offers, offersByType.offers, isDisabled);
 
   const isSubmitDisabled = dateFrom === null || dateTo === null;
 
@@ -121,9 +132,10 @@ const createEditingFormTemplate = (form, allDestinations, offersByType) => {
           <span class="visually-hidden">Choose event type</span>
           <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
         </label>
-        <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+        <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox"
+        ${isDisabled ? 'disabled' : ''}>
 
-        <div class="event__type-list">
+        <div class="event__type-list" ${isDisabled ? 'disabled' : ''}>
           <fieldset class="event__type-group">
           <legend class="visually-hidden">Event type</legend>
           ${eventTypesList}
@@ -133,10 +145,14 @@ const createEditingFormTemplate = (form, allDestinations, offersByType) => {
       ${availableDestinations}
       <div class="event__field-group  event__field-group--time">
         <label class="visually-hidden" for="event-start-time-1">From</label>
-        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value='${humanizedDateFrom}'>
+        <input class="event__input  event__input--time" id="event-start-time-1" type="text"
+        ${isDisabled ? 'disabled' : ''} 
+        name="event-start-time" value='${humanizedDateFrom}'>
         &mdash;
         <label class="visually-hidden" for="event-end-time-1">To</label>
-        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value='${humanizedDateTo}'>
+        <input class="event__input  event__input--time" id="event-end-time-1" type="text"
+        ${isDisabled ? 'disabled' : ''} 
+        name="event-end-time" value='${humanizedDateTo}'>
       </div>
 
       <div class="event__field-group  event__field-group--price">
@@ -144,11 +160,14 @@ const createEditingFormTemplate = (form, allDestinations, offersByType) => {
           <span class="visually-hidden">Price</span>
           &euro;
         </label>
-        <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value=${basePrice}>
+        <input class="event__input  event__input--price" id="event-price-1" type="text" 
+        name="event-price" value=${basePrice}  ${isDisabled ? 'disabled' : ''}>
       </div>
 
-      <button class="event__save-btn  btn  btn--blue" type="submit" ${isSubmitDisabled ? 'disabled' : ''}>Save</button>
-      <button class="event__reset-btn" type="reset">Delete</button>
+      <button class="event__save-btn  btn  btn--blue" type="submit" 
+      ${isSubmitDisabled || isDisabled? 'disabled' : ''}>
+      ${isSaving ? 'Saving...' : 'Save'}</button>
+      <button class="event__reset-btn" type="reset">${isDeleting ? 'Deleting...' : 'Delete'}</button>
       <button class="event__rollup-btn" type="button">
         <span class="visually-hidden">Open event</span>
       </button>
@@ -343,14 +362,24 @@ export default class EditingFormView extends AbstractStatefulView {
 
     const newPrice = Number(evt.target.value);
 
-    if(Number.isFinite(newPrice) && newPrice >= 0) {
+    if(Number.isFinite(newPrice) && newPrice > 0) {
       this._setState({
         basePrice: newPrice,
       });
     }
   };
 
-  static parseFormToState = (form) => ({...form});
+  static parseFormToState = (form) => ({...form,
+    isDisabled: false,
+    isSaving: false,
+    isDeleting: false,
+  });
 
-  static parseStateToForm = (state) => ({...state});
+  static parseStateToForm = (state) => {
+    delete state.isDisabled;
+    delete state.isSaving;
+    delete state.isDeleting;
+
+    return state;
+  };
 }
