@@ -53,12 +53,6 @@ export default class TripEventsPresenter {
     this.#renderTripEvents();
   }
 
-  createNewForm (callback) {
-    this.#currentSortType = SortType.DAY;
-    this.#filtersModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
-    this.#newFormPresenter.init(callback);
-  }
-
   get points() {
     const points = this.#pointsModel.points;
 
@@ -78,6 +72,13 @@ export default class TripEventsPresenter {
   get destinations() {return this.#destinationsModel.destinations;}
 
   get offers () {return this.#offersModel.offers;}
+
+  createNewForm (callback) {
+    this.#currentSortType = SortType.DAY;
+    this.#filtersModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+    this.#deleteNoEventsComponent();
+    this.#newFormPresenter.init(callback);
+  }
 
   #renderPoint (point) {
     const pointPresenter = new PointPresenter(this.#eventsListComponent.element, this.#handleViewAction, this.#handleModeChange);
@@ -107,7 +108,7 @@ export default class TripEventsPresenter {
     }
   };
 
-  #clearEvents= ({resetSortType = false} = {}) => {
+  #clearEvents = ({resetSortType = false} = {}) => {
     this.#newFormPresenter.destroy();
     this.#eventsPresenter.forEach((presenter) => presenter.destroy());
     this.#eventsPresenter.clear();
@@ -203,9 +204,7 @@ export default class TripEventsPresenter {
       return;
     }
 
-    const points = this.points;
-
-    if(points.length === 0){
+    if(this.points.length === 0){
       this.#renderNoEvents();
       return;
     }
