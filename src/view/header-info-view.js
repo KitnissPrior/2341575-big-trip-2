@@ -1,16 +1,22 @@
 import AbstractView from '../framework/view/abstract-view.js';
 import { humanizeHeaderDate, isMonthsEqual } from '../utils/point.js';
 
+const CitiesCount = {
+  ONE_CITY: 1,
+  TWO_CITIES: 2,
+  THREE_CITIES:3,
+};
+
 const getCitiesBlock = (cities) => {
   let route = '';
   switch (cities.length){
-    case 1:
+    case CitiesCount.ONE_CITY:
       route = cities[0];
       break;
-    case 2:
+    case CitiesCount.TWO_CITIES:
       route = `${cities[0]}  —  ${cities[1]}`;
       break;
-    case 3:
+    case CitiesCount.THREE_CITIES:
       route = `${cities[0]}  —  ${cities[1]}  —  ${cities[2]}`;
       break;
     default:
@@ -44,16 +50,6 @@ const createHeaderTemplate = (tripInfo) => {
     </section>`
   );
 };
-/*`<section class="trip-main__trip-info  trip-info">
-    <div class="trip-info__main">
-    ${getCitiesBlock(cities)}
-    ${getDatesBlock(dateFrom, dateTo)}
-    </div>
-
-    <p class="trip-info__cost">
-      Total: &euro;&nbsp;<span class="trip-info__cost-value">${price}</span>
-    </p>
-    </section>`*/
 
 export default class HeaderInfoView extends AbstractView {
   #tripInfo = null;

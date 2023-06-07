@@ -27,24 +27,6 @@ export default class HeaderPresenter {
     this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
-  init = () => {
-    const filters = this.filters;
-    const prevFilterComponent = this.#filterComponent;
-
-    this.#filterComponent = new FilterView(filters, this.#filterModel.filter);
-    this.#filterComponent.setFilterTypeChangeHandler(this.#handleFilterTypeChange);
-
-    if (prevFilterComponent === null) {
-      render(this.#filterComponent, this.#headerContainer);
-      return;
-    }
-
-    replace(this.#filterComponent, prevFilterComponent);
-    remove(prevFilterComponent);
-
-    this.#renderInfo();
-  };
-
   get points () {return this.#pointsModel.points;}
 
   get filters() {
@@ -70,6 +52,24 @@ export default class HeaderPresenter {
   get destinations() {return this.#destinationsModel.destinations;}
 
   get offers () {return this.#offersModel.offers;}
+
+  init = () => {
+    const filters = this.filters;
+    const prevFilterComponent = this.#filterComponent;
+
+    this.#filterComponent = new FilterView(filters, this.#filterModel.filter);
+    this.#filterComponent.setFilterTypeChangeHandler(this.#handleFilterTypeChange);
+
+    if (prevFilterComponent === null) {
+      render(this.#filterComponent, this.#headerContainer);
+      return;
+    }
+
+    replace(this.#filterComponent, prevFilterComponent);
+    remove(prevFilterComponent);
+
+    this.#renderInfo();
+  };
 
   #getTotalPrice = (points) => {
     let price = 0;

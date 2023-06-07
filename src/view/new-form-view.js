@@ -207,6 +207,17 @@ export default class NewFormView extends AbstractStatefulView {
     return createNewFormTemplate(this._state, this.#destinations, this.#offersByType);
   }
 
+  _restoreHandlers = () => {
+    this.#setInnerHandlers();
+
+    this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setFormCloseHandler(this._callback.formClose);
+    this.setDeleteClickHandler(this._callback.deleteClick);
+
+    this.#setDatepickerDateFrom();
+    this.#setDatepickerDateTo();
+  };
+
   removeElement = () => {
     super.removeElement();
 
@@ -238,17 +249,6 @@ export default class NewFormView extends AbstractStatefulView {
   setDeleteClickHandler = (callback) => {
     this._callback.deleteClick = callback;
     this.element.querySelector('.event__reset-btn').addEventListener('click', this.#formDeleteClickHandler);
-  };
-
-  _restoreHandlers = () => {
-    this.#setInnerHandlers();
-
-    this.setFormSubmitHandler(this._callback.formSubmit);
-    this.setFormCloseHandler(this._callback.formClose);
-    this.setDeleteClickHandler(this._callback.deleteClick);
-
-    this.#setDatepickerDateFrom();
-    this.#setDatepickerDateTo();
   };
 
   #setInnerHandlers = () => {

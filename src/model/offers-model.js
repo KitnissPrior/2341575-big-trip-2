@@ -10,6 +10,8 @@ export default class OffersModel extends Obserbvable {
     this.#pointsApiService = pointsApiService;
   }
 
+  get offers () {return this.#offers;}
+
   init = async () => {
     try {
       this.#offers = await this.#pointsApiService.offers;
@@ -19,7 +21,5 @@ export default class OffersModel extends Obserbvable {
 
     this._notify(UpdateType.INIT);
   };
-
-  get offers () {return this.#offers;}
 
 }
