@@ -22,7 +22,7 @@ const newEventButtonComponent = siteHeaderElement.querySelector('.trip-main__eve
 
 const headerPresenter = new HeaderPresenter(siteHeaderElement.querySelector('.trip-controls__filters'),
   filtersModel, pointsModel, offersModel, destinationsModel);
-const tripPresenter = new TripEventsPresenter(siteMainElement, pointsModel, 
+const tripPresenter = new TripEventsPresenter(siteMainElement, pointsModel,
   offersModel, destinationsModel, filtersModel);
 
 const handleNewFormClose = () => {

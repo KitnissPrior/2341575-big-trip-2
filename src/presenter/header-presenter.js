@@ -81,12 +81,12 @@ export default class HeaderPresenter {
 
       if (offersByCurrentType.length > 0 && point.offers.length > 0){
         point.offers.forEach((offerId) => {
-          const offer = offersByCurrentType.find((offer) => offer.id === offerId);
+          const offer = offersByCurrentType.find((offerByType) => offerByType.id === offerId);
           price += offer.price;
         });
       }
     });
-    
+
     return price;
   };
 
@@ -96,15 +96,15 @@ export default class HeaderPresenter {
     }
 
     return null;
-  }
-  
+  };
+
   #getEndDate = (points) => {
     if(points.length > 0){
       return points[points.length - 1].dateTo;
     }
 
     return null;
-  }
+  };
 
   #getCities = (points) => {
     if(this.destinations.length > 0){
@@ -129,20 +129,26 @@ export default class HeaderPresenter {
   };
 
   #renderInfo = () => {
-    const previousInfoComponent = this.#infoComponent;
+    let previousInfoComponent = this.#infoComponent;
 
     if(this.points.length && this.offers.length && this.destinations.length) {
       this.#updateInfo();
     }
-
-    if(previousInfoComponent) {
+    if(this.points.length === 0 && previousInfoComponent){
       replace(this.#infoComponent, previousInfoComponent);
       remove(previousInfoComponent);
+      previousInfoComponent = null;
+      return;
     }
-    else if(this.#infoComponent)
+
+    if(this.#infoComponent)
     {
+      if(previousInfoComponent) {
+        replace(this.#infoComponent, previousInfoComponent);
+        remove(previousInfoComponent);
+      }
       render(this.#infoComponent, this.#headerContainer, RenderPosition.AFTERBEGIN);
-    } 
+    }
   };
 
   #handleModelEvent = () => {

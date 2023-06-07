@@ -42,8 +42,8 @@ const createHeaderTemplate = (tripInfo) => {
       Total: &euro;&nbsp;<span class="trip-info__cost-value">${price}</span>
     </p>
     </section>`
-    );
-}
+  );
+};
 /*`<section class="trip-main__trip-info  trip-info">
     <div class="trip-info__main">
     ${getCitiesBlock(cities)}
