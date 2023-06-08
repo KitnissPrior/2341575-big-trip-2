@@ -7,17 +7,21 @@ import { getOffersByType } from '../utils/common.js';
 import { sortPointsByDay } from '../utils/point.js';
 
 export default class HeaderPresenter {
-  #headerContainer = null;
   #filterModel = null;
   #pointsModel = null;
   #offersModel = null;
   #destinationsModel = null;
 
+  #headerContainer = null;
+  #filtersContainer = null;
+
   #filterComponent = null;
   #infoComponent = null;
 
-  constructor(headerContainer, filterModel, pointsModel, offersModel, destinationsModel) {
+  constructor(headerContainer, filtersContainer, filterModel, pointsModel, offersModel, destinationsModel) {
     this.#headerContainer = headerContainer;
+    this.#filtersContainer = filtersContainer;
+
     this.#filterModel = filterModel;
     this.#pointsModel = pointsModel;
     this.#offersModel = offersModel;
@@ -61,7 +65,7 @@ export default class HeaderPresenter {
     this.#filterComponent.setFilterTypeChangeHandler(this.#handleFilterTypeChange);
 
     if (prevFilterComponent === null) {
-      render(this.#filterComponent, this.#headerContainer);
+      render(this.#filterComponent, this.#filtersContainer);
       return;
     }
 

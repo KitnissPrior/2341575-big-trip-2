@@ -362,7 +362,7 @@ export default class EditingFormView extends AbstractStatefulView {
 
     const newPrice = Number(evt.target.value);
 
-    if(Number.isFinite(newPrice) && newPrice > 0) {
+    if(Number.isFinite(newPrice) && newPrice >= 0) {
       this._setState({
         basePrice: newPrice,
       });

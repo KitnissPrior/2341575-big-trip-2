@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import { humanizeHeaderDate, isMonthsEqual } from '../utils/point.js';
+import { humanizeHeaderDate, isMonthsEqual, isDatesEqual } from '../utils/point.js';
 
 const CitiesCount = {
   ONE_CITY: 1,
@@ -28,10 +28,15 @@ const getCitiesBlock = (cities) => {
 };
 
 const getDatesBlock = (dateFrom, dateTo) => {
+  let datesBlock = `${humanizeHeaderDate(dateFrom)}`;
+
   const humanizedDateTo = humanizeHeaderDate(dateTo);
-  return `<p class="trip-info__dates">
-  ${humanizeHeaderDate(dateFrom)}&nbsp;&mdash;&nbsp;${isMonthsEqual(dateFrom, dateTo)? humanizedDateTo.split(' ')[1] : humanizedDateTo}
-  </p>`;
+
+  if (!isDatesEqual(dateFrom, dateTo)) {
+    datesBlock +=`&nbsp;&mdash;&nbsp;${isMonthsEqual(dateFrom, dateTo)? humanizedDateTo.split(' ')[1] : humanizedDateTo}`;
+  }
+
+  return `<p class="trip-info__dates">${datesBlock}</p>`;
 };
 
 const createHeaderTemplate = (tripInfo) => {
