@@ -10,6 +10,8 @@ export default class PointsModel extends Obserbvable {
     this.#pointsApiService = pointsApiService;
   }
 
+  get points () { return this.#points;}
+
   init = async () => {
     try {
       const points = await this.#pointsApiService.points;
@@ -20,8 +22,6 @@ export default class PointsModel extends Obserbvable {
 
     this._notify(UpdateType.INIT);
   };
-
-  get points () { return this.#points;}
 
   updatePoint = async (updateType, update) => {
     const index = this.#points.findIndex((point) => point.id === update.id);

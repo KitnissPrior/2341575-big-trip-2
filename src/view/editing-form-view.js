@@ -205,6 +205,17 @@ export default class EditingFormView extends AbstractStatefulView {
     return createEditingFormTemplate(this._state, this.#destinations, this.#offersByType);
   }
 
+  _restoreHandlers = () => {
+    this.#setInnerHandlers();
+
+    this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setFormCloseHandler(this._callback.formClose);
+    this.setDeleteClickHandler(this._callback.deleteClick);
+
+    this.#setDatepickerDateFrom();
+    this.#setDatepickerDateTo();
+  };
+
   removeElement = () => {
     super.removeElement();
 
@@ -236,17 +247,6 @@ export default class EditingFormView extends AbstractStatefulView {
   setDeleteClickHandler = (callback) => {
     this._callback.deleteClick = callback;
     this.element.querySelector('.event__reset-btn').addEventListener('click', this.#formDeleteClickHandler);
-  };
-
-  _restoreHandlers = () => {
-    this.#setInnerHandlers();
-
-    this.setFormSubmitHandler(this._callback.formSubmit);
-    this.setFormCloseHandler(this._callback.formClose);
-    this.setDeleteClickHandler(this._callback.deleteClick);
-
-    this.#setDatepickerDateFrom();
-    this.#setDatepickerDateTo();
   };
 
   #setInnerHandlers = () => {
@@ -362,7 +362,7 @@ export default class EditingFormView extends AbstractStatefulView {
 
     const newPrice = Number(evt.target.value);
 
-    if(Number.isFinite(newPrice) && newPrice > 0) {
+    if(Number.isFinite(newPrice) && newPrice >= 0) {
       this._setState({
         basePrice: newPrice,
       });

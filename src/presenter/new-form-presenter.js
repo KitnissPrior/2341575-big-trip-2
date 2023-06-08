@@ -32,8 +32,7 @@ export default class NewFormPresenter {
     this.#newFormComponent = new NewFormView(this.#getBlankForm(), this.#destinations, this.#offers);
 
     this.#newFormComponent.setFormSubmitHandler(this.#handleFormSubmit);
-    this.#newFormComponent.setFormCloseHandler(this.#handleFormClose);
-    this.#newFormComponent.setDeleteClickHandler(this.#handleDeleteClick);
+    this.#newFormComponent.setCancelClickHandler(this.#handleCancelClick);
 
     render(this.#newFormComponent, this.#eventsListContainer, RenderPosition.AFTERBEGIN);
 
@@ -73,11 +72,10 @@ export default class NewFormPresenter {
   };
 
   #getBlankForm = () => ({
-    'basePrice': 1,
+    'basePrice': 0,
     'dateFrom': dayjs().toDate(),
     'dateTo': dayjs().toDate(),
     'destination': this.#destinations[0].id,
-    'id': 0,
     'isFavourite': false,
     'offers': [],
     'type': EVENT_TYPES[0],
@@ -91,9 +89,7 @@ export default class NewFormPresenter {
     );
   };
 
-  #handleDeleteClick = () => this.destroy();
-
-  #handleFormClose = () => this.destroy();
+  #handleCancelClick = () => this.destroy();
 
   #escKeyDownHandler = (evt) => {
     if (isEscape(evt)){

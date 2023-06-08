@@ -103,7 +103,6 @@ const createNewFormTemplate = (form, allDestinations, offersByType) => {
     type,
     isDisabled,
     isSaving,
-    isDeleting
   } = form;
 
   const offersBlock = getOffersBlock(offers, offersByType.offers, isDisabled);
@@ -169,10 +168,7 @@ const createNewFormTemplate = (form, allDestinations, offersByType) => {
       ${isSubmitDisabled || isDisabled ? 'disabled' : ''}>
       ${isSaving ? 'Saving...' : 'Save'}</button>
       <button class="event__reset-btn" type="reset">
-      ${isDeleting ? 'Deleting...' : 'Delete'}</button>
-      <button class="event__rollup-btn" type="button">
-        <span class="visually-hidden">Open event</span>
-      </button>
+      Cancel</button>
     </header>
     <section class="event__details">
       ${offersBlock}
@@ -207,6 +203,16 @@ export default class NewFormView extends AbstractStatefulView {
     return createNewFormTemplate(this._state, this.#destinations, this.#offersByType);
   }
 
+  _restoreHandlers = () => {
+    this.#setInnerHandlers();
+
+    this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setCancelClickHandler(this._callback.cancelClick);
+
+    this.#setDatepickerDateFrom();
+    this.#setDatepickerDateTo();
+  };
+
   removeElement = () => {
     super.removeElement();
 
@@ -230,25 +236,9 @@ export default class NewFormView extends AbstractStatefulView {
     this.element.addEventListener('submit', this.#formSubmitHandler);
   };
 
-  setFormCloseHandler = (callback) => {
-    this._callback.formClose = callback;
-    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#formCloseHandler);
-  };
-
-  setDeleteClickHandler = (callback) => {
-    this._callback.deleteClick = callback;
-    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#formDeleteClickHandler);
-  };
-
-  _restoreHandlers = () => {
-    this.#setInnerHandlers();
-
-    this.setFormSubmitHandler(this._callback.formSubmit);
-    this.setFormCloseHandler(this._callback.formClose);
-    this.setDeleteClickHandler(this._callback.deleteClick);
-
-    this.#setDatepickerDateFrom();
-    this.#setDatepickerDateTo();
+  setCancelClickHandler = (callback) => {
+    this._callback.cancelClick = callback;
+    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#formCancelClickHandler);
   };
 
   #setInnerHandlers = () => {
@@ -295,14 +285,9 @@ export default class NewFormView extends AbstractStatefulView {
     this._callback.formSubmit(NewFormView.parseStateToForm(this._state));
   };
 
-  #formCloseHandler = (evt) => {
+  #formCancelClickHandler = (evt) => {
     evt.preventDefault();
-    this._callback.formClose();
-  };
-
-  #formDeleteClickHandler = (evt) => {
-    evt.preventDefault();
-    this._callback.deleteClick(NewFormView.parseStateToForm(this._state));
+    this._callback.cancelClick();
   };
 
   #pointTypeClickHandler = (evt) => {
@@ -364,7 +349,7 @@ export default class NewFormView extends AbstractStatefulView {
 
     const newPrice = Number(evt.target.value);
 
-    if(Number.isFinite(newPrice) && newPrice > 0) {
+    if(Number.isFinite(newPrice) && newPrice >= 0) {
       this._setState({
         basePrice: newPrice,
       });
@@ -374,13 +359,11 @@ export default class NewFormView extends AbstractStatefulView {
   static parseFormToState = (form) => ({...form,
     isDisabled: false,
     isSaving: false,
-    isDeleting: false,
   });
 
   static parseStateToForm = (state) => {
     delete state.isDisabled;
     delete state.isSaving;
-    delete state.isDeleting;
 
     return state;
   };

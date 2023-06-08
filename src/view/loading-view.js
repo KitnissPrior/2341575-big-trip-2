@@ -1,6 +1,6 @@
 import AbstractView from '../framework/view/abstract-view.js';
 
-const createNoPointsTemplate = () => (
+const createLoadingTemplate = () => (
   `<p class="trip-events__msg">
     Loading...
   </p>`
@@ -8,6 +8,6 @@ const createNoPointsTemplate = () => (
 
 export default class LoadingView extends AbstractView {
   get template() {
-    return createNoPointsTemplate();
+    return createLoadingTemplate();
   }
 }
